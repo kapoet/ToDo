@@ -37,7 +37,7 @@ export default class pp extends Component<{}> {
         </TouchableOpacity>
                 <Text style={styles.noteText}>{this.props.val.date}</Text>
                 <Text style={styles.noteText}>{this.props.val.note}</Text>
-
+                <Text style={styles.noteText}>{this.props.val.category}</Text>
                 <TouchableOpacity onPress={this.props.deleteMethod} style={styles.noteDelete}>
                     <Text style={styles.noteDeleteText}>D</Text>
                 </TouchableOpacity>

@@ -13,6 +13,7 @@ import {
 import { StackNavigator } from 'react-navigation';
 import DatePicker from 'react-native-datepicker';
 var PickerItem = Picker.Item;
+import axios from 'axios'
 export default class Main extends Component<{}> {
 
     constructor(props) {
@@ -22,38 +23,80 @@ export default class Main extends Component<{}> {
             toDoInput: '',
             dueDate:'',
             done:false,
-            category:[],
+            category:[{category:'Project kantor'},{category:'Main'}],
             isModal : false,
-            selectCate:'',
-            inputcate:''
+            selectCate:'Project kantor',
+            inputcate:'',
+            bebe:{}
         }
     }
 
     addNote() {
-        if (this.state.toDoInput) {
-            this.state.toDoList.push({
-                note: this.state.toDoInput,
-                date: this.state.dueDate, 
-                status: this.state.done,
-                category: this.state.selectCate
-            });
+        const datan = this.state.bebe;
+        const {state} = this.props.navigation
+        return axios.post('https://ngc-todo.herokuapp.com/api/tasks', {
+            userId: state.params.user,
+            status: this.state.done,
+            task: this.state.toDoInput,
+            dueDate: this.state.dueDate,
+            category:this.state.selectCate
+        })
+            .then(function (response) {
+                console.log(response)
+                
+                console.log(bebe)
+                return this.setState({
+                    bebe: response.data
+                  });; 
+                
+            })
+        if (bebe!=null) {
+            // this.state.toDoList.push({
+            //     note: this.state.toDoInput,
+            //     date: this.state.dueDate, 
+            //     status: this.state.done,
+            //     category: this.state.selectCate               
+            // });
+            console.log(bebe)
         }
-        this.setState({ toDoList: this.state.toDoList });
+        // this.setState({ toDoList: this.state.toDoList });
         this.setState({ toDoInput: '' });
         this.setState({ dueDate: '' });
+        
+        console.log(bebe)
     }
     check(key) {
         this.state.toDoList[key].status= !this.state.toDoList[key].status
-        this.setState({ toDoList: this.state.toDoList });
-        console.log(this.state.toDoList[key].status)
+        axios.delete('https://ngc-todo.herokuapp.com/api/tasks/'+this.state.toDoList[key].taskId, {
+            status: this.state.toDoList[key].status,
+            task: this.state.toDoList[key].note,
+        })
+            .then(function (response) {
+                console.log(response)
+                if (response.data.success == true) {
+                    this.setState({ toDoList: this.state.toDoList });
+                    console.log(this.state.toDoList[key].status)
+                } else {
+                    Alert.alert(response.data.message)
+                }
+            })
     }
     deleteNote(key) {
-        this.state.toDoList.splice(key, 1);
-        this.setState({ toDoList: this.state.toDoList });
+        
+        axios.delete('https://ngc-todo.herokuapp.com/api/tasks/'+this.state.toDoList[key].taskId)
+            .then(function (response) {
+                console.log(response)
+                if (response.data.success == true) {
+                    this.state.toDoList.splice(key, 1);
+                    this.setState({ toDoList: this.state.toDoList });
+                } else {
+                    Alert.alert(response.data.message)
+                }
+            })
     }
     tambahcategory(){
         this.state.category.push({
-            categorya:this.state.inputcate
+            category:this.state.inputcate
         })
         this.setState({ isModal: false })
         this.setState({inputcate:''})
@@ -66,8 +109,9 @@ export default class Main extends Component<{}> {
                 check={()=>this.check(key)}/>
         });
         let categoryItems = this.state.category.map((s, i) => {
-            return <Picker.Item key={i} label={s.categorya} value={s.categorya}/>
+            return <Picker.Item key={i} label={s.category} value={s.category}/>
         });
+        
         return (
             <View style={styles.container}>
                 <TextInput
@@ -138,8 +182,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
     },
     scrollContainer: {
-        flex: 1,
-        marginBottom: 100
+        flex: 1
     },
     modalView: {
         height:200,

@@ -59,7 +59,7 @@ export default class Login extends Component<{}> {
                 .then(function (response) {
                     console.log(response)
                     if (response.data.success == true) {
-                        navigate('Home')
+                        navigate('Home',{user:response.data.data._id})
                     } else {
                         this.setState({validate:false})
                         Alert.alert(response.data.message)

@@ -39,7 +39,8 @@ export default class Login extends Component<{}> {
     .then(function (response) {
       console.log(response)
       if(response.data.message=='User login successful'){
-        navigate('Home')
+        navigate('Home',{user:response.data.data._id})
+        console.log(response.data._id)
       } else{
         Alert.alert("Data Yang anda masukkan salah")
       }
