@@ -26,13 +26,11 @@ export default class Main extends Component<{}> {
             category:[{category:'Project kantor'},{category:'Main'}],
             isModal : false,
             selectCate:'Project kantor',
-            inputcate:'',
-            bebe:{}
+            inputcate:''
         }
     }
 
     addNote() {
-        const datan = this.state.bebe;
         const {state} = this.props.navigation
         return axios.post('https://ngc-todo.herokuapp.com/api/tasks', {
             userId: state.params.user,
@@ -43,27 +41,35 @@ export default class Main extends Component<{}> {
         })
             .then(function (response) {
                 console.log(response)
-                
-                console.log(bebe)
-                return this.setState({
-                    bebe: response.data
-                  });; 
-                
+                return response.data; 
+                if (response.data.success == true) {
+                    () =>  this.state.toDoList.push({
+                        taskId:response.data.data._id,
+                        note: this.state.toDoInput,
+                        date: this.state.dueDate, 
+                        status: this.state.done,
+                        category: this.state.selectCate               
+                    });
+                    console.log(this.state.toDoList)
+                    this.setState({ toDoList: this.state.toDoList });
+                } else {
+                    Alert.alert(response.data.message)
+                }
             })
-        if (bebe!=null) {
+        if (this.state.toDoInput) {
             // this.state.toDoList.push({
             //     note: this.state.toDoInput,
             //     date: this.state.dueDate, 
             //     status: this.state.done,
             //     category: this.state.selectCate               
             // });
-            console.log(bebe)
+            console.log(this.state.selectCate)
         }
         // this.setState({ toDoList: this.state.toDoList });
         this.setState({ toDoInput: '' });
         this.setState({ dueDate: '' });
         
-        console.log(bebe)
+        console.log(state.params.user)
     }
     check(key) {
         this.state.toDoList[key].status= !this.state.toDoList[key].status
